@@ -12,6 +12,7 @@ private:
     void Insert(const elemType &x,treeNode<elemType> *&t);
     bool Find(const elemType &x,treeNode<elemType> *t) const;
     void DelTree(treeNode<elemType> *t);
+    int Hight(treeNode<elemType> *t) const;
     bool IsOld(treeNode<elemType>* t,const elemType a,const elemType b) const;
 public:
     binarySearchTree(treeNode<elemType> *t = NULL){root = t;}
@@ -41,7 +42,11 @@ void binarySearchTree<elemType>::DelTree(treeNode<elemType> *t){
     DelTree(t->right);
     delete t;
 }
-
+template<class elemType>
+int binarySearchTree<elemType>::Hight(treeNode<elemType> *t) const{
+    if (!t) return 0;
+    return 1+std::max(Hight(t->left),Hight(t->right));
+}
 template<class elemType>
 bool binarySearchTree<elemType>::IsOld(treeNode<elemType> *t, const elemType a, const elemType b) const{
     if (Find(a, t) && Find(b, t)) return true;
@@ -64,19 +69,21 @@ template<class elemType>
 elemType binarySearchTree<elemType>::LCA(const elemType &a, const elemType &b,const elemType &stopFlag) const{
     seqQueue<treeNode<elemType>*> queue;
     treeNode<elemType>* temp;
+    int min = Hight(root)+1;
     elemType L = stopFlag;
-    
 
     if (!root) return stopFlag;
     queue.enQueue(root);
 
     while(!queue.isEmpty()){
         temp = queue.deQueue();
-        if (!IsOld(temp, a, b)) return L;
+        if (Hight(temp) < min && IsOld(temp, a, b)){
+            min = Hight(temp);
+            L = temp->data;
+        }
         if (temp->left) queue.enQueue(temp->left);
         if (temp->right) queue.enQueue(temp->right);
-        L = temp->data;
     }
-    return stopFlag;
+    return  L;
 }
 #endif
